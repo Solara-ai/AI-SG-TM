@@ -4,11 +4,9 @@ from routes.chat_router import router as chat_router
 from routes.suggestion_route import router as suggestion_router
 
 app = FastAPI(
-    title="My API",
-    description="This is a sample API",
-    version="1.0",
-    docs_url="/api/ai/swagger-ui.html",
-    redoc_url="/redocs"
+    docs_url="/api/ai/swagger-ui.html",  # Thay đổi đường dẫn Swagger UI
+    redoc_url=None,  # (Tùy chọn) Tắt Redoc nếu không cần
+    openapi_url="/api/ai/openapi.json"  # (Tùy chọn) Thay đổi OpenAPI JSON
 )
 
 app.include_router(suggestion_router)
