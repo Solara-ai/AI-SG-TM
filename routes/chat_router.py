@@ -13,7 +13,7 @@ import openai
 
 load_dotenv()
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-router = APIRouter()
+router = APIRouter(prefix="/api/ai")
 
 
 def get_bot_reply(text: str) -> str:
@@ -33,7 +33,7 @@ def get_bot_reply(text: str) -> str:
         return "Lỗi khi kết nối với OpenAI: " + str(e)
 
 
-@router.post("/", response_model=MessageResponse)
+@router.post("/chat", response_model=MessageResponse)
 async def chat(msg: MessageRequest):
     # không cần create_conversation ở đây nữa nếu conversation đã có sẵn
     reply = get_bot_reply(msg.text)

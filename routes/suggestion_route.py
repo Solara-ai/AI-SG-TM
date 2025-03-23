@@ -4,10 +4,10 @@ from database.mongo_services import db
 from datetime import datetime
 from bson import ObjectId, errors
 
-router = APIRouter()
+router = APIRouter(prefix="/api/ai")
 
 
-@router.get("/ai-suggestion")
+@router.get("/noti-suggestion")
 def get_ai_schedule_suggestion(userId: str = Query(..., description="ID của người dùng")):
     try:
         # Kiểm tra userId có phải ObjectId hợp lệ không
