@@ -7,7 +7,7 @@ app = FastAPI(
     title="My API",
     description="This is a sample API",
     version="1.0",
-    docs_url="api/ai/swagger-ui.html",
+    docs_url="/api/ai/swagger-ui.html",
     redoc_url="/redocs"
 )
 
