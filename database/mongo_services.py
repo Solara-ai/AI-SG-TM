@@ -44,8 +44,7 @@ def delete_conversation(conversation_id):
     return {"message": "Conversation deleted successfully"}
 
 
-def get_history(user_id, conversation_id):
+def get_history( conversation_id):
     return chat_collection.find_one({
         "_id": conversation_id.strip(),
-        "user_id": user_id.strip()
     })

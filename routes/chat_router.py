@@ -41,12 +41,12 @@ async def chat(msg: MessageRequest):
     return MessageResponse(reply=reply)
 
 
-@router.get("/history/{user_id}/{conversation_id}")
-async def get_conversation_history(user_id: str, conversation_id: str):
-    conversation = get_history(user_id.strip(), conversation_id.strip())
+@router.get("/history/{conversation_id}")
+async def get_conversation_history( conversation_id: str):
+    conversation = get_history( conversation_id.strip())
+    print(conversation)
     if conversation:
         return {
-            "user_id": user_id,
             "conversation_id": conversation_id,
             "messages": conversation.get("messages", [])
         }
