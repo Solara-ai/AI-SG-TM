@@ -13,7 +13,6 @@ load_dotenv()
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 router = APIRouter(prefix="/api/ai")
 
-
 def get_bot_reply(text: str) -> str:
     try:
         response = openai_client.chat.completions.create(

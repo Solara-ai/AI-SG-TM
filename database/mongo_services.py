@@ -14,7 +14,6 @@ db = mongo_client["sgtm"]
 chat_collection = db["conversations"]
 
 
-#
 # def create_conversation(user_id: str):
 #     conversation_id = str(uuid.uuid4())  # Tạo ID dạng chuỗi
 #     chat_collection.insert_one({
