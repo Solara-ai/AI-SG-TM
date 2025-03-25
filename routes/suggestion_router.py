@@ -1,10 +1,13 @@
+import logging
+
 from fastapi import APIRouter, Query
+import logging
 from services.ai_service import get_ai_suggestions
 from database.mongo_services import db
 from datetime import datetime
 from bson import ObjectId, errors
 
-router = APIRouter(prefix="/api/ai")
+router = APIRouter()
 
 
 @router.get("/noti-suggestion")

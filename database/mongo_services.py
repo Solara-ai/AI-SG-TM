@@ -1,15 +1,13 @@
 import uuid
+
 from datetime import datetime
 from http.client import HTTPException
-
+from config import settings
 from bson import ObjectId
 from pymongo import MongoClient
-from dotenv import load_dotenv
 import os
 
-load_dotenv()
-
-mongo_client = MongoClient(os.getenv("MONGO_URI"))
+mongo_client = MongoClient(settings.MONGO_URI)
 db = mongo_client["sgtm"]
 chat_collection = db["conversations"]
 users_collection = db["users"]

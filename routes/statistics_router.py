@@ -5,7 +5,7 @@ from fastapi import APIRouter, Query
 from database.mongo_services import db
 from services.statistics_service import get_statistics, get_recent_activities
 
-router = APIRouter(prefix="/api")
+router = APIRouter()
 
 
 @router.get("/statistics")

@@ -1,8 +1,6 @@
 import os
-import uuid
 from datetime import datetime
-from uuid import uuid4
-
+import uuid
 from dotenv import load_dotenv
 from fastapi import APIRouter
 from openai import OpenAI
@@ -12,8 +10,7 @@ from database.mongo_services import add_message, get_history, chat_collection
 
 load_dotenv()
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-router = APIRouter(prefix="/api/ai")
-
+router = APIRouter()
 
 def get_bot_reply(text: str) -> str:
     try:
@@ -31,13 +28,11 @@ def get_bot_reply(text: str) -> str:
     except Exception as e:
         return "Lỗi khi kết nối với OpenAI: " + str(e)
 
-
-@router.post("/chat", response_model=MessageResponse)
+@router.post("", response_model=MessageResponse)
 async def chat(msg: MessageRequest):
     reply = get_bot_reply(msg.text)
 
     # Lưu vào DB theo user_id
-
     message_data = {
         "_id": str(uuid.uuid4()),  # ID dưới dạng chuỗi
         "user_id": msg.user_id,
