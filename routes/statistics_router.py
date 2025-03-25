@@ -10,35 +10,37 @@ router = APIRouter()
 def statistics():
     return get_statistics()
 
-
+#có cần thiết đâu
 @router.get("/recent-activities")
 def get_recent_activities():
     activities = []
 
     # 🟢 Lấy người dùng mới đăng ký gần nhất
-    new_user = db["users"].find_one({}, {"userName": 1, "phone": 1})
+    new_user = db["users"].find_one({}, {"fullName": 1, "phone": 1})
     if new_user:
+        user_name = new_user.get("fullName", "Người dùng ẩn danh")  # Tránh lỗi KeyError
+        phone = new_user.get("phone", "Không có số điện thoại")  # Tránh lỗi KeyError
         activities.append({
-            "text": f"Người dùng mới đăng ký: {new_user['userName']}.",
-            "phonenumber": new_user["phone"],
-            "time": None  # Không có thời gian, để tránh lỗi
+            "text": f"Người dùng mới đăng ký: {user_name}.",
+            "phonenumber": phone,
+            "time": None  # Không có thời gian, tránh lỗi sắp xếp
         })
 
     # 🔵 Lấy cuộc trò chuyện mới nhất
-    recent_chat = db["conversations"].find_one({}, {"user_id": 1, "created_at": 1}, sort=[("created_at", -1)])
-    if recent_chat and "created_at" in recent_chat:
+    recent_chat = db["conversations"].find_one({}, {"user_id": 1, "timestamp": 1}, sort=[("timestamp", -1)])
+    if recent_chat and "timestamp" in recent_chat:
         user = db["users"].find_one({"_id": recent_chat["user_id"]}, {"userName": 1})
-        user_name = user["userName"] if user else "Người dùng ẩn danh"
+        user_name = user.get("userName", "Người dùng ẩn danh") if user else "Người dùng ẩn danh"
         activities.append({
             "text": f"{user_name} vừa chat với bot.",
-            "time": recent_chat["created_at"]
+            "time": recent_chat["timestamp"]
         })
 
     # 🟠 Lấy feedback mới nhất
-    recent_feedback = db["feedbacks"].find_one({}, {"userId": 1, "createdAt": 1}, sort=[("createdAt", -1)])
+    recent_feedback = db["feedbacks"].find_one({}, {"userId": 1, "messages": 1, "createdAt": 1}, sort=[("createdAt", -1)])
     if recent_feedback and "createdAt" in recent_feedback:
         user = db["users"].find_one({"_id": recent_feedback["userId"]}, {"userName": 1})
-        user_name = user["userName"] if user else "Người dùng ẩn danh"
+        user_name = user.get("userName", "Người dùng ẩn danh") if user else "Người dùng ẩn danh"
         activities.append({
             "text": f"{user_name} vừa gửi feedback mới.",
             "time": recent_feedback["createdAt"]
