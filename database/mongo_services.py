@@ -12,6 +12,9 @@ load_dotenv()
 mongo_client = MongoClient(os.getenv("MONGO_URI"))
 db = mongo_client["sgtm"]
 chat_collection = db["conversations"]
+users_collection = db["users"]
+schedules_collection = db["schedules"]
+feedbacks_collection = db["feedbacks"]
 
 
 # def create_conversation(user_id: str):
@@ -34,8 +37,6 @@ def add_message(conversation_id, user_text, bot_reply):
             }}
         }
     )
-
-
 #
 # def delete_conversation(conversation_id):
 #     result = chat_collection.delete_one({"_id": conversation_id.strip()})
