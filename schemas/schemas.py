@@ -17,21 +17,20 @@ class MessageResponse(BaseModel):
 
 
 class ChatMessage(BaseModel):
-    text: str
     reply: str
-    timestamp: str  # Định dạng ISO 8601
 
+class UserChatHistoryData(BaseModel):
+    user_id: str
+    messages: List[ChatMessage]
 
 
 class UserChatHistoryResponse(BaseModel):
     httpStatus: int
     resultCode: str
     resultMsg: str
-    resourceId: Optional[str]  # user_id
+    resourceId: str
     responseTimestamp: str
-    data: List[ChatMessage]  # Đổi từ messages -> data
-
-
+    data: UserChatHistoryData
 
 class AiSuggestion(BaseModel):
     activity: str

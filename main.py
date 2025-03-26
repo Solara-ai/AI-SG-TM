@@ -8,6 +8,7 @@ from routes import api_router
 from utils.logger import configure_logging
 
 app = FastAPI(
+    port=8001,
     title=settings.API_TITLE,
     version=settings.API_VERSION,
     root_path=settings.ROOT_PATH,

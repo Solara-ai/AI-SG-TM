@@ -58,11 +58,7 @@ async def get_user_history(user_id: str):
 
     if messages:
         history = [
-            ChatMessage(
-                text=m.get("text", ""),
-                reply=m.get("reply", ""),
-                timestamp=m.get("timestamp", datetime.utcnow()).isoformat()
-            )
+            {"reply": m.get("reply", "")}  # Chỉ lấy trường "reply"
             for m in messages
         ]
 
@@ -72,7 +68,10 @@ async def get_user_history(user_id: str):
             resultMsg="User chat history retrieved successfully",
             resourceId=user_id,
             responseTimestamp=datetime.utcnow().isoformat(),
-            data=history  # Đổi messages -> data
+            data={
+                "user_id": user_id,
+                "messages": history
+            }
         )
 
     return UserChatHistoryResponse(
@@ -81,7 +80,10 @@ async def get_user_history(user_id: str):
         resultMsg="No chat history found for this user",
         resourceId=user_id,
         responseTimestamp=datetime.utcnow().isoformat(),
-        data=[]  # Đổi messages -> data
+        data={
+            "user_id": user_id,
+            "messages": []
+        }
     )
 
 #
