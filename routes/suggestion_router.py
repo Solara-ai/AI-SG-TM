@@ -2,6 +2,8 @@ import logging
 
 from fastapi import APIRouter, Query
 import logging
+
+from schemas.schemas import AiScheduleResponse, AiSuggestion
 from services.ai_service import get_ai_suggestions
 from database.mongo_services import db
 from datetime import datetime
@@ -10,21 +12,17 @@ from bson import ObjectId, errors
 router = APIRouter()
 
 
-@router.get("/noti-suggestion")
+@router.get("/noti-suggestion", response_model=AiScheduleResponse)
 def get_ai_schedule_suggestion(userId: str = Query(..., description="ID của người dùng")):
     try:
-        # Kiểm tra userId có phải ObjectId hợp lệ không
-        try:
-            user_id = userId
-        except errors.InvalidId:
-            return {"error": "userId không hợp lệ. Định dạng ObjectId không đúng."}
+        # Kiểm tra userId có hợp lệ không
+        user_id = userId
 
         schedules = db["schedules"]
         today = datetime.now().strftime("%Y-%m-%d")
 
         pipeline = [
             {"$match": {"date": today, "userId": user_id}},
-
             {"$lookup": {
                 "from": "categories", "localField": "categoryId", "foreignField": "_id", "as": "category"}},
             {"$unwind": {"path": "$category", "preserveNullAndEmptyArrays": True}},
@@ -40,7 +38,14 @@ def get_ai_schedule_suggestion(userId: str = Query(..., description="ID của ng
 
         data = list(schedules.aggregate(pipeline))
         if not data:
-            return {"message": "Không có lịch trình cho hôm nay."}
+            return AiScheduleResponse(
+                httpStatus=200,
+                resultCode="204 NO CONTENT",
+                resultMsg="Không có lịch trình cho hôm nay",
+                resourceId=user_id,
+                responseTimestamp=datetime.utcnow().isoformat(),
+                data=[]
+            )
 
         user_data = data[0]
         hobbies = user_data.get("hobbies", [])
@@ -54,7 +59,24 @@ def get_ai_schedule_suggestion(userId: str = Query(..., description="ID của ng
         }
 
         ai_suggestions = get_ai_suggestions(data, user_info)
-        return {"suggestions": ai_suggestions}
+        suggestions_list = [AiSuggestion(**s) for s in ai_suggestions]
+
+        return AiScheduleResponse(
+            httpStatus=200,
+            resultCode="100 CONTINUE",
+            resultMsg="Lấy gợi ý thành công",
+            resourceId=user_id,
+            responseTimestamp=datetime.utcnow().isoformat(),
+            data=suggestions_list
+        )
 
     except Exception as e:
-        return {"error": str(e)}
+        return AiScheduleResponse(
+            httpStatus=500,
+            resultCode="500 INTERNAL SERVER ERROR",
+            resultMsg="Đã xảy ra lỗi trong quá trình xử lý",
+            resourceId=userId,
+            responseTimestamp=datetime.utcnow().isoformat(),
+            data=[],
+            error=str(e)
+        )

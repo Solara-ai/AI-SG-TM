@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from fastapi import APIRouter
 from openai import OpenAI
 
-from schemas.schemas import MessageRequest, MessageResponse
+from schemas.schemas import MessageRequest, MessageResponse, UserChatHistoryResponse, ChatMessage
 from database.mongo_services import add_message, get_history, chat_collection
 
 load_dotenv()
@@ -28,7 +28,8 @@ def get_bot_reply(text: str) -> str:
     except Exception as e:
         return "Lỗi khi kết nối với OpenAI: " + str(e)
 
-@router.post("", response_model=MessageResponse)
+
+@router.post("", response_model=UserChatHistoryResponse)
 async def chat(msg: MessageRequest):
     reply = get_bot_reply(msg.text)
 
@@ -38,26 +39,50 @@ async def chat(msg: MessageRequest):
         "user_id": msg.user_id,
         "text": msg.text,
         "reply": reply,
-        "timestamp": datetime.now()
+        "timestamp": datetime.utcnow().isoformat()
     }
     chat_collection.insert_one(message_data)
 
-    return MessageResponse(reply=reply)
+    return UserChatHistoryResponse(
+        httpStatus=200,
+        resultCode="100 CONTINUE",
+        resultMsg="Chat response generated successfully",
+        resourceId=msg.user_id,
+        responseTimestamp=datetime.utcnow().isoformat(),
+        data=[ChatMessage(**message_data)]  # Đặt tin nhắn vào `data` dưới dạng danh sách
+    )
 
-
-@router.get("/history/{user_id}")
+@router.get("/history/{user_id}", response_model=UserChatHistoryResponse)
 async def get_user_history(user_id: str):
     messages = list(chat_collection.find({"user_id": user_id}))
+
     if messages:
-        history = []
-        for m in messages:
-            history.append({
-                "text": m.get("text"),
-                "reply": m.get("reply"),
-                "timestamp": m.get("timestamp")
-            })
-        return {"user_id": user_id, "messages": history}
-    return {"message": "Không có lịch sử chat cho user này"}
+        history = [
+            ChatMessage(
+                text=m.get("text", ""),
+                reply=m.get("reply", ""),
+                timestamp=m.get("timestamp", datetime.utcnow()).isoformat()
+            )
+            for m in messages
+        ]
+
+        return UserChatHistoryResponse(
+            httpStatus=200,
+            resultCode="100 CONTINUE",
+            resultMsg="User chat history retrieved successfully",
+            resourceId=user_id,
+            responseTimestamp=datetime.utcnow().isoformat(),
+            data=history  # Đổi messages -> data
+        )
+
+    return UserChatHistoryResponse(
+        httpStatus=404,
+        resultCode="404 NOT FOUND",
+        resultMsg="No chat history found for this user",
+        resourceId=user_id,
+        responseTimestamp=datetime.utcnow().isoformat(),
+        data=[]  # Đổi messages -> data
+    )
 
 #
 # @router.delete("/conversation/{conversation_id}")
