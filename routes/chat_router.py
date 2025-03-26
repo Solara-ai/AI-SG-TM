@@ -33,15 +33,33 @@ def get_bot_reply(text: str) -> str:
 async def chat(msg: MessageRequest):
     reply = get_bot_reply(msg.text)
 
-    # Lưu vào DB theo user_id
-    message_data = {
-        "_id": str(uuid.uuid4()),  # ID dưới dạng chuỗi
-        "user_id": msg.user_id,
+    # Tạo tin nhắn mới
+    new_message = {
         "text": msg.text,
         "reply": reply,
         "timestamp": datetime.utcnow().isoformat()
     }
-    chat_collection.insert_one(message_data)
+
+    # Kiểm tra user_id đã tồn tại trong DB chưa
+    user_chat = chat_collection.find_one({"user_id": msg.user_id})
+
+    if user_chat:
+        # Nếu đã có, cập nhật danh sách messages
+        chat_collection.update_one(
+            {"user_id": msg.user_id},
+            {"$push": {"messages": new_message}}
+        )
+    else:
+        # Nếu chưa có, tạo mới
+        chat_collection.insert_one({
+            "_id": str(uuid.uuid4()),
+            "user_id": msg.user_id,
+            "messages": [new_message],  # Mảng chứa tin nhắn
+            "created_at": datetime.utcnow().isoformat()
+        })
+
+    # Lấy lại dữ liệu sau khi cập nhật để trả về response
+    updated_chat = chat_collection.find_one({"user_id": msg.user_id})
 
     return UserChatHistoryResponse(
         httpStatus=200,
@@ -49,8 +67,11 @@ async def chat(msg: MessageRequest):
         resultMsg="Chat response generated successfully",
         resourceId=msg.user_id,
         responseTimestamp=datetime.utcnow().isoformat(),
-        data=[ChatMessage(**message_data)]  # Đặt tin nhắn vào `data` dưới dạng danh sách
+        data={
+            "messages": updated_chat["messages"]
+        }
     )
+
 @router.get("/history/{user_id}", response_model=UserChatHistoryResponse)
 async def get_user_history(user_id: str):
     messages = list(chat_collection.find({"user_id": user_id}))

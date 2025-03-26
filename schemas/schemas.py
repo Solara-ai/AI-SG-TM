@@ -19,11 +19,13 @@ class MessageResponse(BaseModel):
 class ChatMessage(BaseModel):
     text: str  # Thêm trường text
     reply: str
+    timestamp: str
 
 
 class UserChatHistoryData(BaseModel):
     user_id: str
     messages: List[ChatMessage]
+
 
 
 class UserChatHistoryResponse(BaseModel):
@@ -32,7 +34,8 @@ class UserChatHistoryResponse(BaseModel):
     resultMsg: str
     resourceId: str
     responseTimestamp: str
-    data: UserChatHistoryData
+    data: dict  # Đổi thành dict để chứa danh sách messages
+
 
 class AiSuggestion(BaseModel):
     activity: str
