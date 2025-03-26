@@ -68,7 +68,7 @@ async def chat(msg: MessageRequest):
         resourceId=msg.user_id,
         responseTimestamp=datetime.utcnow().isoformat(),
         data={
-            "messages": updated_chat["messages"]
+            "messages": [new_message]  # Chỉ trả về tin nhắn mới nhất
         }
     )
 

@@ -27,7 +27,6 @@ class UserChatHistoryData(BaseModel):
     messages: List[ChatMessage]
 
 
-
 class UserChatHistoryResponse(BaseModel):
     httpStatus: int
     resultCode: str
@@ -42,6 +41,7 @@ class AiSuggestion(BaseModel):
     recommendation: str
     startTime: str
     endTime: str
+
 
 class AiScheduleResponse(BaseModel):
     httpStatus: int
