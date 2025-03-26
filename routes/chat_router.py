@@ -2,15 +2,16 @@ import os
 from datetime import datetime
 import uuid
 from dotenv import load_dotenv
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from openai import OpenAI
 
 from schemas.schemas import MessageRequest, MessageResponse, UserChatHistoryResponse, ChatMessage
-from database.mongo_services import add_message, get_history, chat_collection
+from database.mongo_services import add_message, get_history, chat_collection, users_collection
 
 load_dotenv()
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 router = APIRouter()
+
 
 def get_bot_reply(text: str) -> str:
     try:
@@ -28,9 +29,13 @@ def get_bot_reply(text: str) -> str:
     except Exception as e:
         return "Lỗi khi kết nối với OpenAI: " + str(e)
 
-
 @router.post("", response_model=UserChatHistoryResponse)
 async def chat(msg: MessageRequest):
+    # Kiểm tra user_id có tồn tại trong users collection không
+    user_exists = users_collection.find_one({"_id": msg.user_id})
+    if not user_exists:
+        raise HTTPException(status_code=400, detail="User ID không tồn tại")
+
     reply = get_bot_reply(msg.text)
 
     # Tạo tin nhắn mới
@@ -39,7 +44,7 @@ async def chat(msg: MessageRequest):
         "reply": reply,
     }
 
-    # Kiểm tra user_id đã tồn tại trong DB chưa
+    # Kiểm tra user_id đã có trong chat_collection chưa
     user_chat = chat_collection.find_one({"user_id": msg.user_id})
 
     if user_chat:
@@ -53,12 +58,9 @@ async def chat(msg: MessageRequest):
         chat_collection.insert_one({
             "_id": str(uuid.uuid4()),
             "user_id": msg.user_id,
-            "messages": [new_message],  # Mảng chứa tin nhắn
+            "messages": [new_message],
             "created_at": datetime.utcnow().isoformat()
         })
-
-    # Lấy lại dữ liệu sau khi cập nhật để trả về response
-    updated_chat = chat_collection.find_one({"user_id": msg.user_id})
 
     return UserChatHistoryResponse(
         httpStatus=200,
@@ -66,48 +68,48 @@ async def chat(msg: MessageRequest):
         resultMsg="Chat response generated successfully",
         resourceId=msg.user_id,
         responseTimestamp=datetime.utcnow().isoformat(),
-        data={
-            "messages": [new_message]  # Chỉ trả về tin nhắn mới nhất
-        }
+        data={"messages": [new_message]}
     )
+
+
 
 @router.get("/history/{user_id}", response_model=UserChatHistoryResponse)
 async def get_user_history(user_id: str):
-    messages = list(chat_collection.find({"user_id": user_id}))
+    user_chat = chat_collection.find_one({"user_id": user_id})
 
-    if messages:
-        history = [
-            {
-                "text": m.get("text", ""),  # Thêm text vào
-                "reply": m.get("reply", "")
-            }
-            for m in messages
-        ]
-
+    if not user_chat:
         return UserChatHistoryResponse(
-            httpStatus=200,
-            resultCode="100 CONTINUE",
-            resultMsg="User chat history retrieved successfully",
+            httpStatus=404,
+            resultCode="404 NOT FOUND",
+            resultMsg="No chat history found for this user",
             resourceId=user_id,
             responseTimestamp=datetime.utcnow().isoformat(),
             data={
                 "user_id": user_id,
-                "messages": history
+                "messages": []
             }
         )
 
+    # Lấy toàn bộ messages nhưng loại bỏ timestamp
+    history = [
+        {
+            "text": msg["text"],
+            "reply": msg["reply"]
+        }
+        for msg in user_chat.get("messages", [])
+    ]
+
     return UserChatHistoryResponse(
-        httpStatus=404,
-        resultCode="404 NOT FOUND",
-        resultMsg="No chat history found for this user",
+        httpStatus=200,
+        resultCode="100 CONTINUE",
+        resultMsg="User chat history retrieved successfully",
         resourceId=user_id,
         responseTimestamp=datetime.utcnow().isoformat(),
         data={
             "user_id": user_id,
-            "messages": []
+            "messages": history  # Danh sách messages không có timestamp
         }
     )
-
 #
 # @router.delete("/conversation/{conversation_id}")
 # async def delete_conversation(conversation_id: str):

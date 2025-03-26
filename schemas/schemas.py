@@ -21,6 +21,7 @@ class ChatMessage(BaseModel):
     reply: str
 
 
+
 class UserChatHistoryData(BaseModel):
     user_id: str
     messages: List[ChatMessage]
