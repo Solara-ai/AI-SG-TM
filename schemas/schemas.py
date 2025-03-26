@@ -19,7 +19,6 @@ class MessageResponse(BaseModel):
 class ChatMessage(BaseModel):
     text: str  # Thêm trường text
     reply: str
-    timestamp: str
 
 
 class UserChatHistoryData(BaseModel):

@@ -37,7 +37,6 @@ async def chat(msg: MessageRequest):
     new_message = {
         "text": msg.text,
         "reply": reply,
-        "timestamp": datetime.utcnow().isoformat()
     }
 
     # Kiểm tra user_id đã tồn tại trong DB chưa
