@@ -17,7 +17,9 @@ class MessageResponse(BaseModel):
 
 
 class ChatMessage(BaseModel):
+    text: str  # Thêm trường text
     reply: str
+
 
 class UserChatHistoryData(BaseModel):
     user_id: str

@@ -51,14 +51,16 @@ async def chat(msg: MessageRequest):
         responseTimestamp=datetime.utcnow().isoformat(),
         data=[ChatMessage(**message_data)]  # Đặt tin nhắn vào `data` dưới dạng danh sách
     )
-
 @router.get("/history/{user_id}", response_model=UserChatHistoryResponse)
 async def get_user_history(user_id: str):
     messages = list(chat_collection.find({"user_id": user_id}))
 
     if messages:
         history = [
-            {"reply": m.get("reply", "")}  # Chỉ lấy trường "reply"
+            {
+                "text": m.get("text", ""),  # Thêm text vào
+                "reply": m.get("reply", "")
+            }
             for m in messages
         ]
 
