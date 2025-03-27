@@ -183,12 +183,58 @@ def get_schedules_count_last_3_months():
 
     return response
 
+# API 6: Số user đã tạo trong tháng
+@router.get("/users/new-last-3-months")
+def get_new_users_last_3_months():
+    now = datetime.utcnow()
 
+    # Xác định 3 tháng gần nhất
+    month_list = []
+    for i in range(2, -1, -1):  # Lấy tháng hiện tại và 2 tháng trước
+        month = (now.month - i) if now.month - i > 0 else (now.month - i + 12)
+        year = now.year if now.month - i > 0 else now.year - 1
+        month_list.append((year, month))
 
+    # Tạo khoảng thời gian
+    first_day = datetime(month_list[0][0], month_list[0][1], 1)
+    last_day = datetime(now.year, now.month + 1, 1) if now.month < 12 else datetime(now.year + 1, 1, 1)
 
+    # Lấy dữ liệu từ MongoDB
+    pipeline = [
+        {
+            "$match": {
+                "createdAt": {"$gte": first_day, "$lt": last_day}
+            }
+        },
+        {
+            "$project": {
+                "month": {"$dateToString": {"format": "%m", "date": "$createdAt"}},
+                "year": {"$dateToString": {"format": "%Y", "date": "$createdAt"}}
+            }
+        },
+        {
+            "$group": {
+                "_id": {"year": "$year", "month": "$month"},
+                "count": {"$sum": 1}
+            }
+        },
+        {
+            "$sort": {"_id.year": 1, "_id.month": 1}
+        }
+    ]
 
+    user_data = list(users_collection.aggregate(pipeline))
 
+    # Chuyển dữ liệu thành dictionary để dễ xử lý
+    user_count_map = {f"{item['_id']['year']}-{item['_id']['month']}": item["count"] for item in user_data}
 
+    # Tạo kết quả đảm bảo đủ 3 tháng
+    result = []
+    for year, month in month_list:
+        key = f"{year}-{month:02d}"
+        result.append({"month": f"{month:02d}", "count": user_count_map.get(key, 0)})
+
+    return {"new_users_last_3_months": result}
 
 
 # #có cần thiết đâu
