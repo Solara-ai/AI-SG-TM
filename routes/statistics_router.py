@@ -42,6 +42,95 @@ async def get_users_with_conversation_percentage():
         "percentage": f"{percentages:.2f}%"
     }
 
+#số lượng chat trong 7 ngày
+
+@router.get("/chats/last-7-days")
+async def get_chat_count_last_7_days():
+    seven_days_ago = datetime.utcnow() - timedelta(days=7)
+
+    # Query MongoDB với format YYYY-MM-DD
+
+    pipeline = [
+        {
+            "$match": {
+                "created_at": {"$exists": True}  # Chỉ lấy document có trường created_at
+            }
+        },
+        {
+            "$addFields": {
+                "created_at": {
+                    "$cond": {
+                        "if": {"$eq": [{"$type": "$created_at"}, "string"]},
+                        "then": {"$dateFromString": {"dateString": "$created_at"}},
+                        "else": "$created_at"
+                    }
+                }
+            }
+        },
+        {
+            "$match": {
+                "created_at": {"$gte": seven_days_ago}  # Lọc trong 7 ngày gần nhất
+            }
+        },
+        {
+            "$project": {
+                "date": {
+                    "$dateToString": {
+                        "format": "%m-%d",
+                        "date": "$created_at"
+                    }
+                },
+                "message_count": {"$size": "$messages"}  # Đếm số lượng messages
+            }
+        },
+        {
+            "$group": {
+                "_id": "$date",
+                "count": {"$sum": "$message_count"}  # Cộng tổng số messages theo ngày
+            }
+        },
+        {
+            "$sort": {"_id": 1}
+        }
+    ]
+
+
+    chat_data = list(chat_collection.aggregate(pipeline))
+
+    # Tạo danh sách 7 ngày gần nhất (format trong Python)
+    last_7_days = [
+        (datetime.utcnow() - timedelta(days=i)).strftime("%Y-%m-%d")
+        for i in range(6, -1, -1)
+    ]
+
+    # Chuyển kết quả từ DB thành dict để dễ tra cứu
+    chat_dict = {item["_id"]: item["count"] for item in chat_data}
+
+    # Chuyển format từ YYYY-MM-DD -> "Sat, Feb 15"
+    response = {
+        "chat_count_last_7_days": [
+            {
+                "date": datetime.strptime(day, "%Y-%m-%d").strftime("%a, %b %d"),
+                "count": chat_dict.get(day, 0),
+            }
+            for day in last_7_days
+        ]
+    }
+
+    return response
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # #có cần thiết đâu
