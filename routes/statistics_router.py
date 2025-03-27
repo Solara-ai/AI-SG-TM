@@ -120,10 +120,68 @@ async def get_chat_count_last_7_days():
     return response
 
 
+# API 5: Số lượng lịch đã tạo trong tháng
+@router.get("/schedules/last-3-months")
+def get_schedules_count_last_3_months():
+    now = datetime.utcnow()
+    first_day = datetime(now.year, now.month - 2, 1) if now.month > 2 else datetime(now.year - 1, now.month + 10, 1)
+    last_day = datetime(now.year, now.month + 1, 1) if now.month < 12 else datetime(now.year + 1, 1, 1)
 
+    pipeline = [
+        {
+            "$project": {
+                "month": {
+                    "$dateToString": {
+                        "format": "%Y-%m",
+                        "date": {
+                            "$dateFromString": {
+                                "dateString": "$date",
+                                "format": "%Y-%m-%d"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "$match": {
+                "month": {"$gte": first_day.strftime("%Y-%m"), "$lt": last_day.strftime("%Y-%m")}
+            }
+        },
+        {
+            "$group": {
+                "_id": "$month",
+                "count": {"$sum": 1}
+            }
+        },
+        {
+            "$sort": {"_id": 1}
+        }
+    ]
 
+    schedule_data = list(schedules_collection.aggregate(pipeline))
 
+    # Lấy danh sách 3 tháng gần nhất
+    last_3_months = [
+        (now.replace(day=1) - timedelta(days=30 * i)).strftime("%Y-%m")
+        for i in range(2, -1, -1)
+    ]
 
+    # Chuyển kết quả từ DB thành dict để dễ tra cứu
+    schedule_dict = {item["_id"]: item["count"] for item in schedule_data}
+
+    # Format dữ liệu để trả về FE
+    response = {
+        "schedules_last_3_months": [
+            {
+                "month": datetime.strptime(month, "%Y-%m").strftime("%b %Y"),  # Hiển thị "Mar 2025"
+                "count": schedule_dict.get(month, 0)
+            }
+            for month in last_3_months
+        ]
+    }
+
+    return response
 
 
 
