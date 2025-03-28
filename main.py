@@ -18,15 +18,7 @@ app = FastAPI(
     redoc_url=None,
 )
 
-allowed_origins = ["http://localhost:3000"]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*", allowed_origins],  # Hoặc thay "*" bằng danh sách domain cụ thể
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # Setup các thành phần
 configure_logging()
