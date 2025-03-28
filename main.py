@@ -4,6 +4,7 @@ from starlette.middleware.cors import CORSMiddleware
 from config import settings
 from core.request_logger import RequestLoggerMiddleware
 
+
 from routes import api_router
 from utils.logger import configure_logging
 
