@@ -17,6 +17,14 @@ app = FastAPI(
     redoc_url=None,
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Hoặc thay "*" bằng danh sách domain cụ thể
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Setup các thành phần
 configure_logging()
 app.add_middleware(RequestLoggerMiddleware)
