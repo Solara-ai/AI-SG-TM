@@ -19,13 +19,6 @@ class RequestLoggerMiddleware(BaseHTTPMiddleware):
         try:
             response = await call_next(request)
 
-            # Thêm Header CORS vào Response
-            if "access-control-allow-origin" not in response.headers:
-                response.headers["access-control-allow-origin"] = "*"
-            if "access-control-allow-methods" not in response.headers:
-                response.headers["access-control-allow-methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-            if "access-control-allow-headers" not in response.headers:
-                response.headers["access-control-allow-headers"] = "Authorization, Content-Type"
 
             process_time = (time.time() - start_time) * 1000
             logger.info(
