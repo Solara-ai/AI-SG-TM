@@ -19,6 +19,10 @@ class RequestLoggerMiddleware(BaseHTTPMiddleware):
         try:
             response = await call_next(request)
 
+            # Thêm Header CORS vào Response
+            response.headers.setdefault("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+            response.headers.setdefault("Access-Control-Allow-Headers", "Authorization, Content-Type")
+
 
             process_time = (time.time() - start_time) * 1000
             logger.info(
