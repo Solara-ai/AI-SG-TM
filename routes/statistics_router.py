@@ -189,11 +189,12 @@ def get_new_users_last_3_months():
     # Chuyển dữ liệu thành dictionary để dễ xử lý
     user_count_map = {f"{item['_id']['year']}-{item['_id']['month']}": item["count"] for item in user_data}
 
-    # Tạo kết quả đảm bảo đủ 3 tháng
+    # Tạo kết quả đảm bảo đủ 3 tháng với tên tháng thay vì số tháng
+    month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     result = []
     for year, month in month_list:
         key = f"{year}-{month:02d}"
-        result.append({"month": f"{month:02d}", "count": user_count_map.get(key, 0)})
+        result.append({"month": month_names[month - 1], "count": user_count_map.get(key, 0)})
 
     return {"new_users_last_3_months": result}
 
