@@ -21,5 +21,6 @@ app = FastAPI(
 
 # Setup các thành phần
 configure_logging()
+app.add_middleware(RequestLoggerMiddleware)
 
 app.include_router(api_router)

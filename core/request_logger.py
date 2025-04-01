@@ -20,7 +20,6 @@ class RequestLoggerMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
 
             # Thêm Header CORS vào Response
-            response.headers.setdefault("Access-Control-Allow-Origin", "*")
             response.headers.setdefault("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
             response.headers.setdefault("Access-Control-Allow-Headers", "Authorization, Content-Type")
 
