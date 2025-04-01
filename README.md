@@ -1,86 +1,97 @@
-# 📅 Lịch trình Gợi ý + Chatbot API — FastAPI Project
+# Time-Flow API
 
-## 👋 Giới thiệu
-Dự án này xây dựng một hệ thống gợi ý lịch trình cho người dùng kết hợp cùng chatbot. Toàn bộ API được phát triển bằng FastAPI, hỗ trợ các chức năng:
-- Gợi ý lịch trình cá nhân hóa.
-- API để thêm/sửa/xoá nội dung liên quan đến chatbot.
+## Introduction
+This is an API system developed using FastAPI and MongoDB, supporting scheduling and AI conversation management.
 
-## 🚀 Công nghệ sử dụng
-Dự án được phát triển bằng Python 3.10+ và sử dụng các thư viện chính sau:
-- **FastAPI**: Framework để xây dựng API nhanh chóng và hiệu quả.
-- **Uvicorn**: ASGI server để chạy ứng dụng FastAPI.
-- **Pydantic**: Hỗ trợ xử lý dữ liệu đầu vào/ra cho API.
-- **SQLAlchemy**: ORM để làm việc với cơ sở dữ liệu.
-- **SQLite hoặc PostgreSQL**: Cơ sở dữ liệu, tùy theo cấu hình.
-
-## 📂 Cấu trúc thư mục
+## Directory Structure
 ```
-project/
+├── core
+│   ├── __init__.py
+│   ├── request_logger.py       # Middleware for logging requests
 │
-├── app/
-│   ├── main.py        # Điểm bắt đầu API
-│   ├── routers/
-│   │   ├── schedule.py  # API gợi ý lịch trình
-│   │   └── chatbot.py   # API thêm/sửa/xoá cho chatbot
-│   ├── models/          # Định nghĩa các bảng CSDL
-│   ├── schemas/         # Định nghĩa các schema dùng Pydantic
-│   ├── services/        # Xử lý logic ứng dụng
+├── database
+│   ├── __init__.py
+│   ├── mongo_services.py       # MongoDB connection and operations
 │
-├── requirements.txt  # Danh sách thư viện cần cài đặt
-├── README.md         # Hướng dẫn sử dụng dự án
+├── models
+│   ├── __init__.py
+│   ├── event_model.py          # Defines data models
+│
+├── routes
+│   ├── __init__.py
+│   ├── chat_router.py          # API for conversations
+│   ├── statistics_router.py    # API for statistics
+│   ├── suggestion_router.py    # API for AI suggestions
+│
+├── schemas
+│   ├── __init__.py
+│   ├── schemas.py              # Defines request/response schemas
+│
+├── services
+│   ├── __init__.py
+│   ├── ai_service.py           # Handles AI logic
+│   ├── statistics_service.py   # Handles statistics logic
+│
+├── utils
+│   ├── __init__.py
+│   ├── logger.py               # Logging configuration
+│   ├── schedule_utils.py       # Utility functions for scheduling
+│
+├── .env                        # Environment variables
+├── .gitignore                  # Git ignore file
+├── config.py                   # System configuration
+├── main.py                     # Main entry point of the application
+├── README.md                   # User guide
 ```
 
-## 📌 Các chức năng chính
+## Installation
+### System Requirements
+- Python 3.9+
+- MongoDB
+- pip (or use venv/conda)
 
-### 1. Gợi ý lịch trình
-- **Endpoint**: `GET /schedule/suggest`
-- **Chức năng**: Trả về danh sách lịch trình phù hợp với người dùng dựa trên các tham số như sở thích, thời gian rảnh, mục tiêu cá nhân,...
-- **Lỗi có thể gặp**: Nếu dữ liệu đầu vào thiếu, API sẽ báo lỗi, cần kiểm tra kỹ schema của Pydantic trước khi gửi request.
+### Install Dependencies
+1. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On macOS/Linux
+   venv\Scripts\activate     # On Windows
+   ```
+2. Install required libraries:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### 2. Quản lý chatbot
-- **Thêm nội dung**: `POST /chatbot/create`
-- **Sửa nội dung**: `PUT /chatbot/update/{id}`
-- **Xoá nội dung**: `DELETE /chatbot/delete/{id}`
-- **Lỗi có thể gặp**: Nếu ID không tồn tại, API sẽ báo lỗi, cần xử lý exception rõ ràng trong code.
+## Configuration
+1. Create a `.env` file with the following template:
+   ```env
+   MONGO_URI=mongodb://localhost:27017
+   DATABASE_NAME=timeflow
+   ```
+2. Modify the necessary values according to your system.
 
-## ⚙️ Hướng dẫn cài đặt và chạy dự án
+## Running the Application
+1. Start MongoDB if it is not already running:
+   ```bash
+   mongod --dbpath /path/to/data/db
+   ```
+2. Run FastAPI:
+   ```bash
+   uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+   ```
 
-### 1. Clone dự án về máy
-```bash
-git clone https://github.com/yourusername/schedule-chatbot-api.git
-cd schedule-chatbot-api
-```
+## API Testing
+Once running, access:
+- **API Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
+- **Redoc:** [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
-### 2. Tạo và kích hoạt môi trường ảo
-```bash
-python -m venv venv
-source venv/bin/activate  # Trên macOS/Linux
-venv\Scripts\activate    # Trên Windows
-```
+## Contribution
+1. Fork this repository.
+2. Create a new branch: `git checkout -b feature-name`
+3. Commit your changes: `git commit -m "Description of changes"`
+4. Push to the repository: `git push origin feature-name`
+5. Create a Pull Request
 
-### 3. Cài đặt các thư viện cần thiết
-```bash
-pip install -r requirements.txt
-```
+## Contact
+If you encounter any issues or have suggestions, open an issue on GitHub or contact via email.
 
-### 4. Chạy ứng dụng
-```bash
-uvicorn app.main:app --reload
-```
-- Sau khi chạy, API sẽ có thể truy cập tại: `http://127.0.0.1:8000`
-- Để xem tài liệu API tự động: `http://127.0.0.1:8000/docs`
-
-## 🛠 Một số lỗi có thể gặp khi cài đặt và cách xử lý
-1. **Lỗi "ModuleNotFoundError: No module named 'fastapi'"**:
-   - Nguyên nhân: FastAPI chưa được cài đặt.
-   - Cách khắc phục: Chạy `pip install -r requirements.txt`.
-
-2. **Lỗi "venv: command not found"**:
-   - Nguyên nhân: Python chưa cài đặt hoặc chưa được thêm vào PATH.
-   - Cách khắc phục: Kiểm tra bằng `python --version`, nếu chưa có thì cần cài đặt Python.
-
-3. **Lỗi cổng 8000 đã bị chiếm dụng**:
-   - Nguyên nhân: Có một ứng dụng khác đang chạy trên cổng 8000.
-   - Cách khắc phục: Chạy với cổng khác, ví dụ: `uvicorn app.main:app --reload --port 8080`.
-
-Chúc bạn cài đặt thành công! 🚀
