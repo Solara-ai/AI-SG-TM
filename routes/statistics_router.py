@@ -14,16 +14,12 @@ async def get_total_users():
 #lấy số người dùng đã sử dụng lịch
 @router.get("/users/with_schedule")
 async def get_users_with_schedules():
-    total_users = users_collection.count_documents({})  # Tổng số người dùng
     users_with_schedules = schedules_collection.distinct("userId")  # Lấy danh sách userId có trong schedules
     unique_users_with_schedules = len(set(users_with_schedules))  # Số lượng user duy nhất
 
-    percentage = (unique_users_with_schedules / total_users * 100) if total_users > 0 else 0
 
     return {
         "users_with_schedules": unique_users_with_schedules,
-        "total_users": total_users,
-        "percentage": f"{percentage:.2f}%"
     }
 
 
