@@ -1,8 +1,7 @@
+import json
 import logging
 
 from fastapi import APIRouter, Query
-import logging
-
 from schemas.schemas import AiScheduleResponse, AiSuggestion
 from services.ai_service import get_ai_suggestions
 from database.mongo_services import db
@@ -10,7 +9,6 @@ from datetime import datetime
 from bson import ObjectId, errors
 
 router = APIRouter()
-
 
 @router.get("/noti-suggestion", response_model=AiScheduleResponse)
 def get_ai_schedule_suggestion(userId: str = Query(..., description="ID của người dùng")):
@@ -59,15 +57,25 @@ def get_ai_schedule_suggestion(userId: str = Query(..., description="ID của ng
         }
 
         ai_suggestions = get_ai_suggestions(data, user_info)
-        suggestions_list = [AiSuggestion(**s) for s in ai_suggestions]
 
+
+        # Kiểm tra nếu ai_suggestions là chuỗi JSON hợp lệ
+        if isinstance(ai_suggestions, str):
+            try:
+                # Chuyển chuỗi JSON thành dict
+                ai_suggestions = json.loads(ai_suggestions)
+            except json.JSONDecodeError as e:
+                print(f"JSONDecodeError: {str(e)}")
+                ai_suggestions = []
+
+        # Trả về chuỗi JSON dạng chuẩn
         return AiScheduleResponse(
             httpStatus=200,
             resultCode="100 CONTINUE",
             resultMsg="Lấy gợi ý thành công",
             resourceId=user_id,
             responseTimestamp=datetime.utcnow().isoformat(),
-            data=suggestions_list
+            data=ai_suggestions  # Trả về dữ liệu ở dạng list[dict] đã chuyển từ JSON string
         )
 
     except Exception as e:

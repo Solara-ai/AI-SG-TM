@@ -1,5 +1,4 @@
 import uuid
-
 from datetime import datetime
 from http.client import HTTPException
 from config import settings
@@ -13,8 +12,6 @@ chat_collection = db["conversations"]
 users_collection = db["users"]
 schedules_collection = db["schedules"]
 feedbacks_collection = db["feedbacks"]
-
-
 
 # def create_conversation(user_id: str):
 #     conversation_id = str(uuid.uuid4())  # Tạo ID dạng chuỗi
@@ -37,16 +34,8 @@ def add_message(conversation_id, user_text, bot_reply):
         }
     )
 
-
-#
-# def delete_conversation(conversation_id):
-#     result = chat_collection.delete_one({"_id": conversation_id.strip()})
-#     if result.deleted_count == 0:
-#         raise HTTPException(status_code=404, detail="Conversation not found")
-#     return {"message": "Conversation deleted successfully"}
-#
-
 def get_history(user_id: str):
     return chat_collection.find_one({
         "_id": user_id.strip(),
     })
+

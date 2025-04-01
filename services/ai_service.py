@@ -20,21 +20,34 @@ def get_ai_suggestions(schedule_data, user_info):
         - Giới tính: {user_info['gender']}
         - Sở thích: {user_info['hobbies']}
 
-        Yêu cầu:
-        1. Phân tích các khoảng thời gian trống giữa các công việc đến 24 giờ
-        2. Gợi ý hoạt động phù hợp (ưu tiên {user_info['hobbies']}) , mặc dù là ưu tiên sở thích nhng cũng cần chú trọng đến sức khỏe nữa
-        3. Định dạng rõ ràng với thời gian cụ thể và nghiêm cấm cho các ký tự đặc biệt vào câu gợi ý  và gợi ý cũng phải phù hợp với thời gian nữa nhé ví dụ : thời gian trống có 30 phút mà lại gợi ý đi vẽ tranh là không được đâu nhé .
-        4. Giữ giọng điệu như một đoạn gợi ý chính hiệu cho người dùng ấy nên cho icon bày tỏ cảm xúc
-        5. Các đoạn mà gợi ý thì bạn hãy nói như là đưa ra lời khuyên cho người dùng vậy : ví dụ như là bạn nên giải lao một chút với game...
-        6. lưu ý tối ưu đầu ra đoạn chat là chỉ cần đưa ra lịch gợi ý thôi nhất định không được thêm các đoạn chat khác vào và bỏ cái đoạn cuối đi như là chúc bạn một ngày vui vẻ
-        7. Bắt buộc chỉ đưa ra lịch gợi ý thôi không cần đầu câu và cuối câu và cái đoạn gợi ý cuối ngày thì nên nói là bạn đã làm việc cả một ngày mệt mỏi rồi hãy tận hưởng thời gian nghỉ ngơi đi nhé . đó thân thiện với người dùng là như vậy 
-        8. Chỉ đưa ra câu gợi ý thôi tuyệt đối không được viết lại lịch của người dùng """
+        Hãy phân tích lịch trình hiện tại của người dùng và tạo các gợi ý hoạt động cho khoảng thời gian trống theo hướng dẫn sau:
+
+        1. Xác định chính xác các khoảng thời gian trống giữa các hoạt động trong ngày (từ 00:00 đến 23:59)
+
+        2. Cho mỗi khoảng trống, đề xuất một hoạt động phù hợp với:
+         - Thời lượng thực tế của khoảng trống (đề xuất phải khả thi trong khung giờ đó)
+         - Ưu tiên sở thích của người dùng: {user_info['hobbies']}
+         - Cân nhắc yếu tố sức khỏe và thời điểm trong ngày
+ 
+        3. Định dạng mỗi gợi ý:
+         - [Giờ bắt đầu] - [Giờ kết thúc]: [Gợi ý hoạt động]
+         - lưu ý là lịch trống có thời gian quá nhiều ví dụ là 5 tiếng thì hãy chia nhỏ ra để có thêm nhiều gợi ý 
+         - chú ý một điều quan trọng nữa là nên tránh gợi ý vào những giừo 00:00 đến 5:00 sáng  
+         - Sử dụng 1-2 emoji phù hợp với hoạt động
+         - Dùng ngôn ngữ thân thiện, trực tiếp (ví dụ: "Bạn nên...")
+         - Không sử dụng ký tự đặc biệt trong phần nội dung gợi ý
+
+        4. Đối với khoảng trống cuối ngày, thêm nội dung: "Bạn đã làm việc cả một ngày mệt mỏi rồi, hãy tận hưởng thời gian nghỉ ngơi đi nhé."
+
+        5. TUYỆT ĐỐI CHỈ trả về danh sách gợi ý hoạt động, không thêm lời chào, giới thiệu hay kết thúc, không nhắc lại lịch trình hiện tại của người dùng.
+
+        """
 
         response = openai_client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {"role": "system",
-                 "content": "Bạn là trợ lý lập lịch trình chuyên nghiệp. Hãy trả lời bằng Tiếng Việt."},
+                 "content": "Bạn là trợ lý lập lịch trình chuyên nghiệp. Hãy trả lời bằng Tiếng Việt. "},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.7,
