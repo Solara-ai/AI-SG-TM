@@ -1,6 +1,6 @@
 import json
 import logging
-
+import re
 from fastapi import APIRouter, Query
 from schemas.schemas import AiScheduleResponse, AiSuggestion
 from services.ai_service import get_ai_suggestions
@@ -10,6 +10,15 @@ from bson import ObjectId, errors
 
 router = APIRouter()
 
+
+def parse_ai_suggestions(ai_text):
+    # Tách từng dòng gợi ý theo các dấu thời gian
+    pattern = r"(\d{2}:\d{2} - \d{2}:\d{2}): (.+)"
+    matches = re.findall(pattern, ai_text)
+
+    suggestions = [{"time": time, "suggestion": suggestion} for time, suggestion in matches]
+
+    return suggestions
 @router.get("/noti-suggestion", response_model=AiScheduleResponse)
 def get_ai_schedule_suggestion(userId: str = Query(..., description="ID của người dùng")):
     try:
@@ -58,12 +67,11 @@ def get_ai_schedule_suggestion(userId: str = Query(..., description="ID của ng
 
         ai_suggestions = get_ai_suggestions(data, user_info)
 
-
         # Kiểm tra nếu ai_suggestions là chuỗi JSON hợp lệ
         if isinstance(ai_suggestions, str):
             try:
                 # Chuyển chuỗi JSON thành dict
-                ai_suggestions = json.loads(ai_suggestions)
+                ai_suggestions = parse_ai_suggestions(ai_suggestions)
             except json.JSONDecodeError as e:
                 print(f"JSONDecodeError: {str(e)}")
                 ai_suggestions = []
