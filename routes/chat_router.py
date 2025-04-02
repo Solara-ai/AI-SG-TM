@@ -25,7 +25,7 @@ def get_bot_reply(text: str) -> str:
                             "Hãy tạo lịch trình hợp lý, không chia nhỏ quá từng giờ mà nhóm các hoạt động trong một khoảng thời gian dài hơn, "
                             "ví dụ: từ 07:30 đến 11:45 là một khoảng thời gian cho một hoạt động dài. đặc biệt là đối với các hoạt động liên quan đến công việc và học tập nên kéo dài khoảng một buổi 3-4 tiếng "
                             "Mỗi hoạt động cần có thời gian rõ ràng và phù hợp với một ngày làm việc bình thường. "
-                            "khi mà đưa ra lịch trình thì hãy đưa ra ở cuối một câu gì đó như là bạn có thấy lịch trình này phù hợp không ? kiểu nhưu vậy "
+                            "khi mà đưa ra lịch trình thì hãy đưa ra ở cuối một câu gì đó như là bạn có thấy lịch trình này phù hợp không ? kiểu như vậy "
                             "khi đưa ra lịch trình như vậy thì cũng hãy đưa ra một vài thời gian để có thể đi tập thể dục thể thao ví dụ : thời gian từ 17:30 - 19:30 | Đi tập thể dục nâng cao sức khỏe "
                             "Lịch trình của bạn phải gợi ý các công việc như: hoàn thành task quan trọng, nghỉ giải lao, ăn trưa, họp nhóm, v.v."
                             "Câu trả lời của bạn phải trả về lịch trình theo format sau:\n\n"

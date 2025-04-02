@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 from pydantic import BaseModel
 
@@ -19,7 +19,6 @@ class MessageResponse(BaseModel):
 class ChatMessage(BaseModel):
     text: str  # Thêm trường text
     reply: str
-
 
 
 class UserChatHistoryData(BaseModel):
@@ -51,3 +50,22 @@ class AiScheduleResponse(BaseModel):
     responseTimestamp: str
     data: List[AiSuggestion]
     error: Optional[str] = None  # Chỉ có khi có lỗi
+
+
+class TimeAnalysisResponse(BaseModel):
+    event_time: List[Dict[str, int]]
+    priority_events: Dict[str, str]
+    health_evaluation: str
+    total_score: int
+    advice: str
+
+
+class TimeAllocation(BaseModel):
+    time_allocation: List[Dict[str, float]]
+
+
+class TimePercentageResponse(BaseModel):
+    working_percentage: float
+    sleeping_percentage: float
+    entertainment_percentage: float
+    free_percentage: float

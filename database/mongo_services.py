@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from http.client import HTTPException
 from config import settings
 from bson import ObjectId
@@ -12,16 +12,6 @@ chat_collection = db["conversations"]
 users_collection = db["users"]
 schedules_collection = db["schedules"]
 feedbacks_collection = db["feedbacks"]
-
-# def create_conversation(user_id: str):
-#     conversation_id = str(uuid.uuid4())  # Tạo ID dạng chuỗi
-#     chat_collection.insert_one({
-#         "_id": conversation_id,
-#         "user_id": user_id.strip(),
-#         "messages": [],
-#         "created_at": datetime.now()
-#     })
-#     return conversation_id  # Trả về để FE hoặc API lưu lại
 
 def add_message(conversation_id, user_text, bot_reply):
     chat_collection.update_one(
