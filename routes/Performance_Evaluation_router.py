@@ -62,6 +62,7 @@ async def evaluate_schedule(user_id: str):
         4. Chấm điểm tổng thể từ 0 đến 10 và cung cấp lời khuyên để cải thiện lịch trình.
 
         LƯU Ý QUAN TRỌNG:
+        - Tổng 4 giá trị trong event_time PHẢI CHÍNH XÁC BẰNG 100
         - Phải trả về đúng định dạng JSON hợp lệ
         - Không được chứa bất kỳ ký tự nào ngoài JSON
         - Không được có newlines (\\n) hoặc thụt lề trong JSON
@@ -85,6 +86,7 @@ async def evaluate_schedule(user_id: str):
             "Overall_score": 7.5,
             "Advice": "string"
         }}
+      
         """
 
         # Gửi yêu cầu GPT để phân tích lịch trình
