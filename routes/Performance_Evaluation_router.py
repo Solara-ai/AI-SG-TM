@@ -80,20 +80,20 @@ async def evaluate_schedule(user_id: str):
 
         Cấu trúc JSON mà bạn cần trả về phải giống như sau:
         {{
-            "event_time": {{
-                "Work_Study": 45.2,
-                "Entertainment_Relaxation": 25.5,
-                "Physical_Health": 20.3,
-                "Others": 9.0
+            "eventTime": {{
+                "workStudy": 45.2,
+                "entertainmentRelaxation": 25.5,
+                "physicalHealth": 20.3,
+                "others": 9.0
             }},
-            "Priority_events": [
+            "prioriTyevents": [
                 "1st : event_name",
                 "2nd : event_name",
                 "3rd : event_name"
             ],
-            "calendar_health": "Poor/Average/Good/Excellent",
-            "Overall_score": 7.5,
-            "Advice": "string"
+            "calendarHealth": "Poor/Average/Good/Excellent",
+            "overallScore": 7.5,
+            "advice": "string"
         }}
       
         """
@@ -124,7 +124,7 @@ async def evaluate_schedule(user_id: str):
             gpt_result = json.loads(json_str)
 
             # Validate cấu trúc JSON
-            required_keys = ["event_time", "Priority_events", "calendar_health", "Overall_score", "Advice"]
+            required_keys = ["eventTime", "prioriTyevents", "calendarHealth", "overallScore", "advice"]
             if not all(key in gpt_result for key in required_keys):
                 raise ValueError("Thiếu các trường bắt buộc trong phản hồi GPT")
 
