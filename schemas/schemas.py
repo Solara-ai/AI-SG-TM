@@ -69,3 +69,16 @@ class TimePercentageResponse(BaseModel):
     sleeping_percentage: float
     entertainment_percentage: float
     free_percentage: float
+
+class GPTResult(BaseModel):
+    work: float
+    play: float
+    enjoy: float
+    other: float
+
+class Schedule(BaseModel):
+    name: str
+    startTime: str
+    endTime: str
+    date: str
+    repeat: str
