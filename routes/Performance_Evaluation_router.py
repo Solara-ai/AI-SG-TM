@@ -35,7 +35,7 @@ class ScheduleAnalysisResponse(BaseModel):
     data: Dict[str, Any]
 
 
-@router.get("/schedules/evaluate/{user_id}")
+@router.get("/schedules/evaluate/{user_id}", response_model=ScheduleAnalysisResponse)
 async def evaluate_schedule(user_id: str):
     try:
         # Lấy lịch trình trong tuần
