@@ -2,7 +2,7 @@ import os
 import uuid
 import json
 from datetime import datetime, timedelta
-from typing import Dict
+from typing import Dict, Any, List
 
 import httpx
 from dotenv import load_dotenv
@@ -24,6 +24,15 @@ class ScheduleResponse(BaseModel):
     endTime: str
     date: str
     repeat: str
+
+
+class ScheduleAnalysisResponse(BaseModel):
+    httpStatus: int
+    resultCode: str
+    resultMsg: str
+    resourceId: str
+    responseTimestamp: str
+    data: Dict[str, Any]
 
 
 @router.get("/schedules/evaluate/{user_id}")
@@ -131,16 +140,20 @@ async def evaluate_schedule(user_id: str):
             )
 
         # Trả về kết quả JSON đã được phân tích
-        return {
-            "httpStatus": 200,
-            "resultCode": "100 CONTINUE",
-            "resultMsg": "User schedule analysis retrieved successfully",
-            "resourceId": str(uuid.uuid4()),
-            "responseTimestamp": datetime.utcnow().isoformat(),
-            "data": gpt_result
-        }
+        return ScheduleAnalysisResponse(
+            httpStatus=200,
+            resultCode="100 CONTINUE",
+            resultMsg="User schedule analysis retrieved successfully",
+            resourceId=str(uuid.uuid4()),  # hoặc có thể dùng user_id nếu muốn
+            responseTimestamp=datetime.utcnow().isoformat(),
+            data=gpt_result
+        )
 
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(e)}"
+        )
+
