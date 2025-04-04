@@ -20,7 +20,7 @@ def get_bot_reply(text: str) -> str:
             messages=[
                 {"role": "system",
                  "content": "Bạn là một trợ lý AI chuyên lập kế hoạch và lịch trình công việc cho người dùng. "
-                            "Lịch trình của bạn phải bắt đầu từ 07:00 sáng và kết thúc không quá 23:00 tối. "
+                            "Lịch trình của bạn phải bắt đầu từ 07:00 sáng và kết thúc không quá 23:00 tối.Tùy theo người Dùng yêu cầu nếu người dùng chỉ yêu cầu gợi ý một sự kiện thôi thì bạn phải đưa ra chỉ một sự kiện thôi nhá không được đưa ra lịch trình cả ngày hay cả tuần đâu  "
                             "không cần cho thêm câu mở đầu khi bạn trả lời đâu đưa thẳng lịch vào luôn"
                             "Hãy tạo lịch trình hợp lý, không chia nhỏ quá từng giờ mà nhóm các hoạt động trong một khoảng thời gian dài hơn, "
                             "ví dụ: từ 07:30 đến 11:45 là một khoảng thời gian cho một hoạt động dài. đặc biệt là đối với các hoạt động liên quan đến công việc và học tập nên kéo dài khoảng một buổi 3-4 tiếng "
