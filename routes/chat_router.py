@@ -84,7 +84,7 @@ async def chat(msg: MessageRequest):
 
     return UserChatHistoryResponse(
         httpStatus=200,
-        resultCode="100 CONTINUE",
+        resultCode="OK",
         resultMsg="Chat response generated successfully",
         resourceId=msg.user_id,
         responseTimestamp=datetime.utcnow().isoformat(),
