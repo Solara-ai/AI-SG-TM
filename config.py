@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     API_VERSION: str = Field(default="1.0.0", description="Version of the API")
     ROOT_PATH: str = Field(..., description="Root path of the API service")
     OPENAI_API_KEY: str = Field(..., description="OpenAI API key")
+    GEMINI_API_KEY: str = Field(..., description="Gemini API key")
     MONGO_URI: str = Field(..., description="MongoDB URI")
     DEBUG: bool = Field(default=False, description="Enable debug mode")
 
