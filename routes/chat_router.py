@@ -146,6 +146,7 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 router = APIRouter()
 
 model = genai.GenerativeModel("gemini-2.0-flash")
+current_time = datetime.now().strftime("%H:%M, %d/%m/%Y")
 
 PROMPT_PREFIX = (
     "Bạn là một trợ lý AI chuyên lập kế hoạch và lịch trình công việc cho người dùng. "
@@ -169,6 +170,7 @@ PROMPT_PREFIX = (
     "...\n\n"
     "Bạn vẫn trả lời các câu hỏi khác bình thường nhưng khi nào người dùng yêu cầu gợi ý lịch thì hãy tuân thủ format và các ý bên trên."
     "Lịch trình cần hợp lý, không chia nhỏ từng khoảng thời gian quá chi tiết, và không có hoạt động ngoài khung giờ từ 07:00 đến 23:00."
+     "**Lưu Ý Quan Trong:** thời gian hiện tại là " + current_time
 )
 
 def get_bot_reply(text: str) -> str:

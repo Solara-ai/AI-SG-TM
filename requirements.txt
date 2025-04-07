@@ -11,5 +11,6 @@ pandas~=2.2.2
 starlette~=0.46.1
 pydantic-settings~=2.8.1
 google~=3.0.0
+google-generativeai
 protobuf~=5.29.4
 httpx~=0.28.1
